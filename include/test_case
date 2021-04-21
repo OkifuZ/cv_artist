@@ -1,0 +1,55 @@
+test case 1:
+
+#include <string>
+#include <iostream>
+#include <vector>
+#include "../include/auxiliary.h"
+#include "../include/image_io.h"
+#include "../include/image_proc.h"
+#include "../include/histogram.h"
+
+int main() {
+	
+	MyImageMatrix m;
+	if (read_img("lenna.png", m, "RGB") == -1) {
+		return 1;
+	}
+	std::vector<float> dist;
+	get_pixel_value_distribution(m, 0);
+	get_pixel_value_distribution(m, 1);
+	get_pixel_value_distribution(m, 2);
+
+	m.get_histogram_vec(dist, 0);
+	MyHistogram hist1(dist);
+	draw_histogram(hist1, "lenna before 1", "blue");
+	m.get_histogram_vec(dist, 1);
+	MyHistogram hist2(dist);
+	draw_histogram(hist2, "lenna before 2", "green");
+	m.get_histogram_vec(dist, 2);
+	MyHistogram hist3(dist);
+	draw_histogram(hist3, "lenna before 3", "red");
+	
+	MyImageMatrix new_img;
+	histogram_equalization(m, new_img);
+
+	get_pixel_value_distribution(new_img, 0);
+	get_pixel_value_distribution(new_img, 1);
+	get_pixel_value_distribution(new_img, 2);
+
+	new_img.get_histogram_vec(dist, 0);
+	MyHistogram new_hist1(dist);
+	draw_histogram(new_hist1, "lenna after 1", "blue");
+	new_img.get_histogram_vec(dist, 1);
+	MyHistogram new_hist2(dist);
+	draw_histogram(new_hist2, "lenna after 2", "green");
+	new_img.get_histogram_vec(dist, 2);
+	MyHistogram new_hist3(dist);
+	draw_histogram(new_hist3, "lenna after 3", "red");
+
+	write_img("h_e_lenna.jpg", new_img);
+
+	cv::waitKey(0);
+}
+
+------------------------------------------------------------
+
