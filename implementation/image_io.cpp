@@ -6,6 +6,7 @@
 #include <iostream>
 #include "../include/image_io.h"
 #include "../include/auxiliary.h"
+#include "../include/frequency.h"
 
 MyImageMatrix::MyImageMatrix(std::vector<int> shape_) {
 	this->valid = false;
@@ -20,6 +21,18 @@ MyImageMatrix::MyImageMatrix(std::vector<int> shape_) {
 	this->mat = std::vector<std::vector<my_pixel>>(shape[0], 
 		std::vector<my_pixel>(shape[1], my_pixel(std::vector<uchar>(channels))));
 	this->valid = true;
+}
+
+MyImageMatrix::MyImageMatrix(const ComplexMat& ano) {
+	this->valid = true;
+	this->shape = std::vector<int>{ ano.n, ano.m, 1 };
+	int channels = 1;
+	this->mat = std::vector<std::vector<my_pixel>>(ano.n, std::vector<my_pixel>(ano.m));
+	for (int i = 0; i < ano.n; i++) {
+		for (int j = 0; j < ano.m; j++) {
+			this->mat[i][j] = my_pixel( floor(ano.mat[i][j].real) );
+		}
+	}
 }
 
 void MyImageMatrix::get_histogram_vec(std::vector<float>& hist_vec, int which_channel) {
@@ -81,6 +94,7 @@ int write_img(std::string img_path, const MyImageMatrix& img_mat, bool show) {
 	int rows = img_mat.shape[0];
 	int cols = img_mat.shape[1];
 	int channels = img_mat.shape[2];
+	std::cout << channels << std::endl;
 	cv::Mat image(rows, cols, CV_8UC(channels), cv::Scalar::all(128));
 	if (channels == 3) {
 		for (int i = 0; i < rows; i++) {
@@ -108,7 +122,9 @@ int write_img(std::string img_path, const MyImageMatrix& img_mat, bool show) {
 	if (show) {
 		cv::imshow("processed image", image);
 	}
-	cv::imwrite(PIC_BASE + img_path, image);
+	if (img_path != "") {
+		cv::imwrite(PIC_BASE + img_path, image);
+	}
 	return 0;
 }
 

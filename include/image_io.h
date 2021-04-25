@@ -7,19 +7,27 @@
 #include <string>
 #include <vector>
 
+class ComplexMat;
+
+
 struct my_pixel {
 	std::vector<uchar> rgb{ 0, 0, 0 };
 	int type = 0; // 0 rgb, 1 grey
 
 	my_pixel() = default;
+	my_pixel(uchar color) {
+		rgb[0] = color;
+	}
 	my_pixel(std::vector<uchar>&& color) {
 		if (color.size() == 1) {
 			rgb[0] = color[0];
+			type = 1;
 		}
 		else if (color.size() == 3) {
 			rgb[0] = color[0];
 			rgb[1] = color[1];
 			rgb[2] = color[2];
+			type = 0;
 		}
 	}
 	
@@ -33,7 +41,8 @@ class MyImageMatrix {
 
 public:
 	MyImageMatrix() = default;
-	MyImageMatrix(std::vector<int> shape_);
+	MyImageMatrix(std::vector<int> shape);
+	MyImageMatrix(const ComplexMat& cmat);
 	
 	bool is_grey_img() const { return valid ? shape[2] == 1 : false; }
 	int channels() const { return valid ? shape[2] : -1; }

@@ -4,6 +4,7 @@
 #include "../include/auxiliary.h"
 #include "../include/image_io.h"
 #include "../include/image_proc.h"
+#include "../include/frequency.h"
 
 
 int get_pixel_value_distribution(MyImageMatrix& src_img, int which_channel) {
@@ -142,3 +143,34 @@ int contrast_strech_type2(MyImageMatrix& src_img, MyImageMatrix& tar_img,
 	return 0;
 }
 
+ComplexMat* FFT_image(MyImageMatrix& src_img) {
+	int n = src_img.shape[0];
+	int m = src_img.shape[1];
+	auto src_mat = ComplexMat(n, m);
+	
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			src_mat.mat[i][j] = { (float)(src_img.mat[i][j].rgb[0]), 0 };
+		}
+	}
+	
+	auto src_mat_center = get_centralized(src_mat);
+
+	auto res = FFT_mat(*src_mat_center);
+	return res;
+}
+
+ComplexMat* DCT_image(MyImageMatrix& src_img) {
+	int n = src_img.shape[0];
+	int m = src_img.shape[1];
+	auto src_mat = ComplexMat(n, m);
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			src_mat.mat[i][j] = { (float)(src_img.mat[i][j].rgb[0]), 0 };
+		}
+	}
+
+	auto res = DCT_mat(src_mat);
+	return res;
+}

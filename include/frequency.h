@@ -5,6 +5,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <vector>
 #include <string>
+#include <iostream>
 
 #include "image_io.h"
 #include "auxiliary.h"
@@ -22,6 +23,8 @@ cValue complexMult(cValue& a, cValue& b);
 
 cValue complexNeg(cValue& a);
 
+void printComplex(cValue& c, std::ostream& out);
+
 
 class ComplexMat {
 
@@ -29,22 +32,65 @@ public:
 
 	int n = 0;
 	int m = 0;
-	cValue** mat;
+	cValue** mat = nullptr;
 
-	ComplexMat(int n, int m) { // n rows m colms
-		mat = new cValue*[n];
-		for (int i = 0; i < n; i++) {
-			mat[i] = new cValue[m];
+	ComplexMat() = default;
+
+	ComplexMat(int n_, int m_) { // n rows m colms
+		mat = new cValue*[n_];
+		for (int i = 0; i < n_; i++) {
+			mat[i] = new cValue[m_];
 		}
+		n = n_;
+		m = m_;
 	}
 
-	~ComplexMat() {
-		for (int  i = 0; i < n; i++) {
-			delete[] mat[i];
+	ComplexMat(const ComplexMat& ano);
+
+	void clear() {
+		if (mat) {
+			for (int i = 0; i < n; i++) {
+				delete[] mat[i];
+			}
+			delete[] mat;
 		}
-		delete[] mat;
+		n = 0;
+		m = 0;
+	}
+
+	void reshape(int n_, int m_) {
+		clear();
+		mat = new cValue * [n_];
+		for (int i = 0; i < n_; i++) {
+			mat[i] = new cValue[m_];
+		}
+		n = n_;
+		m = m_;
+	}
+
+	ComplexMat& operator=(const ComplexMat& mat);
+
+	~ComplexMat() {
+		clear();
 	}
 
 };
 
-void FFT_array(cValue* arr);
+ComplexMat* get_transpose(ComplexMat& mat);
+
+ComplexMat* get_pixel_trans(ComplexMat& mat, bool use_log);
+
+ComplexMat* get_abs(ComplexMat& mat);
+
+ComplexMat* get_centralized(ComplexMat& mat);
+
+ComplexMat* get_divided(ComplexMat& mat, float n);
+
+
+void FFT_array(cValue* arr, int length, bool inverse);
+
+ComplexMat* FFT_mat(const ComplexMat& ori);
+
+ComplexMat* IFFT_mat(const ComplexMat& ori);
+
+ComplexMat* DCT_mat(const ComplexMat& ori);
